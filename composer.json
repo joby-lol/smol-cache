@@ -1,0 +1,30 @@
+{
+    "name": "joby/smol-cache",
+    "description": "A set of simple lightweight caching implementations, and wrappers for implementing the same interfaces from common standards.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "psr/simple-cache": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Joby\\Smol\\Cache\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Joby\\Smol\\Cache\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Joby Elliott",
+            "email": "code@joby.lol"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^12.1",
+        "phpstan/phpstan": "^2.1"
+    }
+}
