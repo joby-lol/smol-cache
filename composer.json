@@ -6,6 +6,9 @@
     "require": {
         "php": ">=8.3"
     },
+    "suggest": {
+        "ext-pdo_sqlite": "Required for SqliteCache"
+    },
     "autoload": {
         "psr-4": {
             "Joby\\Smol\\Cache\\": "src/"
