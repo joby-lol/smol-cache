@@ -191,7 +191,9 @@ class SqliteCache implements CacheInterface
     protected function initializePdo(string $file_path): PDO
     {
         // First check if file exists, so that we can initialize the schema if necessary
-        $existing = file_exists($file_path);
+        $new = $file_path == ':memory:'
+            || !file_exists($file_path)
+            || filesize($file_path) === 0;
         // Create and configure the PDO
         $pdo = new PDO('sqlite:' . $file_path);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -204,7 +206,7 @@ class SqliteCache implements CacheInterface
         // Keep temporary tables in memory
         $pdo->exec("PRAGMA temp_store = MEMORY;");
         // If the file didn't exist, initialize the schema
-        if (!$existing)
+        if ($new)
             $this->initializeDatabase($pdo);
         return $pdo;
     }
