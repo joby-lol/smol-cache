@@ -15,11 +15,14 @@ interface CacheInterface
     /**
      * Get an item from the cache if it exists, otherwise set it to the default value. The default value may be a callable, in which case it will be executed and its return value cached and returned. If $ttl is provided, it specifies the time-to-live in seconds, overriding the default value for this cache. If $tags are provided, they will be associated with the cached item for later clearing.
      * 
+     * @template T of mixed
      * @param string|string[] $tags
+     * @param (callable(mixed...):T)|null $default
+     * @return ($default is null ? mixed : T)
      */
     public function get(
         string $key,
-        mixed $default = null,
+        callable|null $default = null,
         int|null $ttl = null,
         string|array $tags = [],
     ): mixed;
@@ -53,7 +56,7 @@ interface CacheInterface
         mixed $value,
         int|null $ttl = null,
         string|array $tags = [],
-    ): mixed;
+    ): static;
 
     /**
      * Check if an item exists in the cache, and is not expired.

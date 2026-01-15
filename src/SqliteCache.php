@@ -112,7 +112,7 @@ class SqliteCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function get(string $key, mixed $default = null, int|null $ttl = null, string|array $tags = []): mixed
+    public function get(string $key, callable|null $default = null, int|null $ttl = null, string|array $tags = []): mixed
     {
         // Prepare and execute the statement
         $statement = $this->getStatement();
@@ -129,10 +129,12 @@ class SqliteCache implements CacheInterface
                 return null;
             }
             else {
-                return $this->set($key, $default, $ttl, $tags);
+                $value = $default();
+                $this->set($key, $value, $ttl, $tags);
+                return $value;
             }
         }
-        // Decode and return the value
+        // Row was found, so decode and return the value
         if (!is_string($result))
             throw new RuntimeException('Cache item value is not a string');
         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
@@ -167,7 +169,7 @@ class SqliteCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): mixed
+    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): static
     {
         if (is_callable($value)) {
             $value = $value();
@@ -185,7 +187,7 @@ class SqliteCache implements CacheInterface
                 ':key' => $key,
             ]);
         }
-        return $value;
+        return $this;
     }
 
     protected function initializePdo(string $file_path): PDO

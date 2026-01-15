@@ -42,28 +42,10 @@ class SqliteCacheTest extends TestCase
         $this->assertEquals('value', $cache->get('key'));
     }
 
-    public function test_set_returns_value(): void
-    {
-        $cache = $this->createCache();
-        $result = $cache->set('key', 'value');
-
-        $this->assertEquals('value', $result);
-    }
-
     public function test_get_nonexistent_returns_null(): void
     {
         $cache = $this->createCache();
         $this->assertNull($cache->get('nonexistent'));
-    }
-
-    public function test_get_with_default(): void
-    {
-        $cache = $this->createCache();
-        $result = $cache->get('missing', 'default');
-
-        $this->assertEquals('default', $result);
-        $this->assertTrue($cache->has('missing'));
-        $this->assertEquals('default', $cache->get('missing'));
     }
 
     public function test_get_with_callable_default(): void

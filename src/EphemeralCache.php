@@ -118,13 +118,18 @@ class EphemeralCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function get(string $key, mixed $default = null, int|null $ttl = null, string|array $tags = []): mixed
+    public function get(string $key, callable|null $default = null, int|null $ttl = null, string|array $tags = []): mixed
     {
         if ($this->has($key)) {
             return $this->data[$key];
         }
+        elseif ($default === null) {
+            return null;
+        }
         else {
-            return $this->set($key, $default, $ttl, $tags);
+            $value = $default();
+            $this->set($key, $value, $ttl, $tags);
+            return $value;
         }
     }
 
@@ -153,7 +158,7 @@ class EphemeralCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): mixed
+    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): static
     {
         // if value is a callable, call it to get the actual value
         if (is_callable($value))
@@ -175,7 +180,7 @@ class EphemeralCache implements CacheInterface
             $this->tags[$tag][] = $key;
         }
         // return
-        return $value;
+        return $this;
     }
 
 }

@@ -20,7 +20,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', null, ['user-tag'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag']);
         $namespace->set('profile', 'data');
@@ -32,7 +32,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('key', 'value', null, [])
-            ->willReturn('value');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, '');
         $namespace->set('key', 'value');
@@ -44,7 +44,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', null, ['user-tag', 'profile-tag'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag']);
         $namespace->set('profile', 'data', null, 'profile-tag');
@@ -56,7 +56,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', null, ['user-tag', 'tag1', 'tag2'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag']);
         $namespace->set('profile', 'data', null, ['tag1', 'tag2']);
@@ -68,7 +68,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', null, ['user-tag'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag']);
         $namespace->set('profile', 'data', null, 'user-tag');
@@ -80,7 +80,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', 600, ['user-tag'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
         $namespace->set('profile', 'data');
@@ -92,7 +92,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/profile', 'data', 300, ['user-tag'])
-            ->willReturn('data');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
         $namespace->set('profile', 'data', 300);
@@ -114,14 +114,16 @@ class CacheNamespaceTest extends TestCase
 
     public function test_get_with_default(): void
     {
+        $callable = fn() => 'default';
+
         $driver = $this->createMock(CacheInterface::class);
         $driver->expects($this->once())
             ->method('get')
-            ->with('user/123/missing', 'default', 300, ['user-tag', 'tag'])
+            ->with('user/123/missing', $callable, 300, ['user-tag', 'tag'])
             ->willReturn('default');
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
-        $result = $namespace->get('missing', 'default', 300, 'tag');
+        $result = $namespace->get('missing', $callable, 300, 'tag');
 
         $this->assertEquals('default', $result);
     }
@@ -192,7 +194,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/settings/theme', 'dark', 100, ['user-tag', 'settings-tag'])
-            ->willReturn('dark');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
         $nested = $namespace->namespace('settings', 'settings-tag', 100);
@@ -205,7 +207,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/settings/theme', 'dark', 600, ['user-tag'])
-            ->willReturn('dark');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
         $nested = $namespace->namespace('settings');
@@ -218,7 +220,7 @@ class CacheNamespaceTest extends TestCase
         $driver->expects($this->once())
             ->method('set')
             ->with('user/123/settings/theme', 'dark', 600, ['user-tag'])
-            ->willReturn('dark');
+            ->willReturnSelf();
 
         $namespace = new CacheNamespace($driver, 'user/123', ['user-tag'], 600);
         $nested = $namespace->namespace('settings');

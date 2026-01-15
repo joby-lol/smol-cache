@@ -110,7 +110,7 @@ class CacheNamespace implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): mixed
+    public function set(string $key, mixed $value, int|null $ttl = null, string|array $tags = []): static
     {
         $this->driver->set(
             $this->key($key),
