@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.1"
     },
     "suggest": {
         "ext-pdo_sqlite": "Required for SqliteCache"
@@ -26,6 +26,7 @@
         }
     ],
     "require-dev": {
+        "php": ">=8.3",
         "phpunit/phpunit": "^12.1",
         "phpstan/phpstan": "^2.1"
     }

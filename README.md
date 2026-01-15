@@ -335,6 +335,10 @@ $cache->clean();     // Remove expired items
 $cache->compact();   // Reclaim disk space (optional, slow, locking)
 ```
 
+## Requirements
+
+Fully tested on PHP 8.3+, static analysis for PHP 8.1+.
+
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details.
