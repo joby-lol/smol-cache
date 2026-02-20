@@ -261,47 +261,65 @@ class SqliteCache implements CacheInterface
         $pdo->exec("CREATE INDEX idx_tag ON cache_tags (tag, key);");
     }
 
+    protected PDOStatement|null $getStatement = null;
+
     protected function getStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->getStatement
+            ??= $this->pdo->prepare("
             SELECT value FROM cache_data
             WHERE key = :key AND expires > :now;
         ");
     }
 
+    protected PDOStatement|null $insertValueStatement = null;
+
     protected function insertValueStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->insertValueStatement
+            ??= $this->pdo->prepare("
             INSERT OR REPLACE INTO cache_data (key, value, expires)
             VALUES (:key, :value, :expires);
         ");
     }
 
+    protected PDOStatement|null $insertTagStatement = null;
+
     protected function insertTagStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->insertTagStatement
+            ??= $this->pdo->prepare("
             INSERT OR REPLACE INTO cache_tags (tag, key)
             VALUES (:tag, :key);
         ");
     }
 
+    protected PDOStatement|null $deleteStatement = null;
+
     protected function deleteStatement(): PDOStatement
     {
-        return $this->pdo->prepare(
+        return $this->deleteStatement
+            ??= $this->pdo->prepare(
             "DELETE FROM cache_data WHERE key = :key;",
         );
     }
 
+    protected PDOStatement|null $deleteRecursiveStatement = null;
+
     protected function deleteRecursiveStatement(): PDOStatement
     {
-        return $this->pdo->prepare(
+        return $this->deleteRecursiveStatement
+            ??= $this->pdo->prepare(
             "DELETE FROM cache_data WHERE key LIKE :key_prefix;",
         );
     }
 
+    protected PDOStatement|null $clearStatement = null;
+
     protected function clearStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->clearStatement
+            ??= $this->pdo->prepare("
             DELETE FROM cache_data
             WHERE key IN (
                 SELECT key FROM cache_tags WHERE tag = :tag
@@ -309,9 +327,12 @@ class SqliteCache implements CacheInterface
         ");
     }
 
+    protected PDOStatement|null $clearRecursiveStatement = null;
+
     protected function clearRecursiveStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->clearRecursiveStatement
+            ??= $this->pdo->prepare("
             DELETE FROM cache_data
             WHERE key IN (
                 SELECT key FROM cache_tags WHERE tag = :tag OR tag LIKE :tag_prefix
@@ -319,9 +340,12 @@ class SqliteCache implements CacheInterface
         ");
     }
 
+    protected PDOStatement|null $hasStatement = null;
+
     protected function hasStatement(): PDOStatement
     {
-        return $this->pdo->prepare("
+        return $this->hasStatement
+            ??= $this->pdo->prepare("
             SELECT 1 FROM cache_data 
             WHERE key = :key AND expires > :now
             LIMIT 1;
