@@ -12,6 +12,7 @@ namespace Joby\Smol\Cache;
 use PDO;
 use PDOStatement;
 use RuntimeException;
+use Throwable;
 
 /**
  * Cache implementation that keeps all data in a single SQLite database file.
@@ -137,7 +138,27 @@ class SqliteCache implements CacheInterface
         // Row was found, so decode and return the value
         if (!is_string($result))
             throw new RuntimeException('Cache item value is not a string');
-        return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+        return static::unserialize($result);
+    }
+
+    protected static function serialize(mixed $value): string
+    {
+        try {
+            return serialize($value);
+        }
+        catch (Throwable $e) {
+            throw new RuntimeException('Failed to serialize cache item value: ' . $e->getMessage(), previous: $e);
+        }
+    }
+
+    protected static function unserialize(string $value): mixed
+    {
+        try {
+            return unserialize($value);
+        }
+        catch (Throwable $e) {
+            throw new RuntimeException('Failed to unserialize cache item value: ' . $e->getMessage(), previous: $e);
+        }
     }
 
     /**
@@ -176,7 +197,7 @@ class SqliteCache implements CacheInterface
         }
         $this->insertValueStatement()->execute([
             ':key'     => $key,
-            ':value'   => json_encode($value, JSON_THROW_ON_ERROR),
+            ':value'   => static::serialize($value),
             ':expires' => time() + ($ttl ?? $this->ttl),
         ]);
         $tags = is_array($tags) ? $tags : [$tags];
